@@ -6,7 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
 
-public class UtilHelper {
+public class HashUtil {
 
     public static String hashString(String input) {
         try {
@@ -20,6 +20,10 @@ public class UtilHelper {
         }
     }
 
+    /**
+     * Generates a random salt
+     * @return a byte array containing the generated salt (16 bytes)
+     */
     private static byte[] generateSalt() {
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[16];

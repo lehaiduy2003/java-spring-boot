@@ -1,15 +1,15 @@
 package com.example.onlinecourses.dtos;
 
 import com.example.onlinecourses.models.Role;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Date;
 import java.util.Set;
 
 
 @Getter
+@Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDTO {
