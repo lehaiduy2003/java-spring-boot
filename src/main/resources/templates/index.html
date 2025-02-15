@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>OAuth2 Test</title>
+</head>
+<body>
+<h1>Welcome to the OAuth2 Test Page</h1>
+<p>Click the button below to log in with Google:</p>
+<a th:href="@{/oauth2/authorization/google}">
+    <button>Login with Google</button>
+</a>
+</body>
+</html>
