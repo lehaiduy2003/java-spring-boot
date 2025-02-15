@@ -5,7 +5,8 @@ import com.example.onlinecourses.dtos.UserDTO;
 import com.example.onlinecourses.mappers.UserMapper;
 import com.example.onlinecourses.models.User;
 import com.example.onlinecourses.services.Interfaces.UserService;
-import com.example.onlinecourses.utils.UtilHelper;
+import com.example.onlinecourses.utils.EncryptData;
+import com.example.onlinecourses.utils.HashUtil;
 import jakarta.annotation.Nullable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -34,38 +35,36 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 
     @Override
     public UserDTO create(UserDTO userDTO) throws IllegalArgumentException {
-        User user = UserMapper.INSTANCE.userDTOToUser(userDTO);
-        hashSensitiveFields(user);
+        User user = UserMapper.INSTANCE.toUser(userDTO);
+        secureSensitiveFields(user);
         updateRoles(user, userDTO);
         usersRepository.save(user);
-        return UserMapper.INSTANCE.userToUserDTO(user);
+        return UserMapper.INSTANCE.toDTO(user);
     }
 
     @Override
     public Boolean deleteByEmail(String email) throws IllegalArgumentException {
-        String hashedEmail = UtilHelper.hashString(email);
-        usersRepository.findByEmail(hashedEmail)
-            .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
-
-        usersRepository.deleteByEmail(hashedEmail);
+        // Check if user exists
+        // Already implemented encryption in findByEmail method
+        findByEmail(email);
+        String encryptedEmail = EncryptData.encrypt(email);
+        usersRepository.deleteByEmail(encryptedEmail);
         return true;
     }
 
     @Override
     public Boolean deleteByPhoneNumber(String phoneNumber) throws IllegalArgumentException {
-        String hashedPhoneNumber = UtilHelper.hashString(phoneNumber);
-        usersRepository.findByPhoneNumber(hashedPhoneNumber)
-            .orElseThrow(() -> new UsernameNotFoundException("User not found with phone number: " + phoneNumber));
-
-        usersRepository.deleteByPhoneNumber(hashedPhoneNumber);
+        // Already implemented encryption in findByEmail method
+        findByPhoneNumber(phoneNumber);
+        String encryptedPhoneNumber = EncryptData.encrypt(phoneNumber);
+        usersRepository.deleteByPhoneNumber(encryptedPhoneNumber);
         return true;
     }
 
     @Override
     public UserDTO updateByEmail(String email, UserDTO userDTO) throws IllegalArgumentException {
-        String hashedEmail = UtilHelper.hashString(email);
-        com.example.onlinecourses.models.User user = usersRepository.findByEmail(hashedEmail)
-            .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+        UserDTO foundUser = findByEmail(email);
+        User user = UserMapper.INSTANCE.toUser(foundUser);
 
         return update(user, userDTO);
     }
@@ -75,56 +74,56 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     }
 
     private UserDTO update(User user, UserDTO userDTO) {
+
         user.setFullName(userDTO.getFullName());
-        user.setAddress(userDTO.getAddress());
+        user.setAddress(EncryptData.encrypt(userDTO.getAddress()));
         user.setBio(userDTO.getBio());
         user.setAvatar(userDTO.getAvatar());
         user.setDob(userDTO.getDob());
         user.setGender(userDTO.isGender());
 
         User updatedUser = usersRepository.save(user);
-        return UserMapper.INSTANCE.userToUserDTO(updatedUser);
+        return UserMapper.INSTANCE.toDTO(updatedUser);
     }
 
-    private void hashSensitiveFields(User user) {
-        user.setPhoneNumber(UtilHelper.hashString(user.getPhoneNumber()));
-        user.setAddress(UtilHelper.hashString(user.getAddress()));
-        user.setEmail(UtilHelper.hashString(user.getEmail()));
-        user.setPassword(UtilHelper.hashString(user.getPassword()));
+    private void secureSensitiveFields(User user) {
+        user.setPhoneNumber(EncryptData.encrypt(user.getPhoneNumber()));
+        user.setAddress(EncryptData.encrypt(user.getAddress()));
+        user.setEmail(EncryptData.encrypt(user.getEmail()));
+        user.setPassword(HashUtil.hashString(user.getPassword()));
     }
 
     @Override
     public UserDTO updateByPhoneNumber(String phoneNumber, UserDTO userDTO) {
-        String hashedPhoneNumber = UtilHelper.hashString(phoneNumber);
-        User user = usersRepository.findByPhoneNumber(hashedPhoneNumber)
-            .orElseThrow(() -> new UsernameNotFoundException("User not found with phone number: " + phoneNumber));
+        UserDTO foundUser = findByPhoneNumber(phoneNumber);
+        User user = UserMapper.INSTANCE.toUser(foundUser);
 
         return update(user, userDTO);
     }
 
     @Override
     public UserDTO findByEmail(String email) {
-        String hashedEmail = UtilHelper.hashString(email);
-        User user = usersRepository.findByEmail(hashedEmail)
+        String encryptedEmail = EncryptData.encrypt(email);
+        User user = usersRepository.findByEmail(encryptedEmail)
             .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
-        return UserMapper.INSTANCE.userToUserDTO(user);
+        return UserMapper.INSTANCE.toDTO(user);
     }
 
     @Override
     public UserDTO findByPhoneNumber(String phoneNumber) {
-        String hashedPhoneNumber = UtilHelper.hashString(phoneNumber);
-        User user = usersRepository.findByPhoneNumber(hashedPhoneNumber)
+        String encryptedPhoneNumber = EncryptData.encrypt(phoneNumber);
+        User user = usersRepository.findByPhoneNumber(encryptedPhoneNumber)
             .orElseThrow(() -> new UsernameNotFoundException("User not found with phone number: " + phoneNumber));
 
-        return UserMapper.INSTANCE.userToUserDTO(user);
+        return UserMapper.INSTANCE.toDTO(user);
     }
 
     @Override
     public UserDTO[] findMany(@Nullable Sort sort) {
         List<User> users = usersRepository.findAll(sort);
 
-        return users.stream().map(UserMapper.INSTANCE::userToUserDTO).toArray(UserDTO[]::new);
+        return users.stream().map(UserMapper.INSTANCE::toDTO).toArray(UserDTO[]::new);
 
     }
 }

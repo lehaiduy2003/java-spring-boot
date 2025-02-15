@@ -1,5 +1,6 @@
 package com.example.onlinecourses.models;
 
+import com.example.onlinecourses.utils.EncryptData;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -94,6 +95,22 @@ public class User implements UserDetails {
             .collect(Collectors.toList());
     }
 
+    // Encrypt sensitive fields before saving or updating the user data
+    @PrePersist
+    @PreUpdate
+    public void encryptSensitiveFields() {
+        this.email = EncryptData.encrypt(this.email);
+        this.phoneNumber = EncryptData.encrypt(this.phoneNumber);
+        this.address = EncryptData.encrypt(this.address);
+    }
+
+    // Decrypt sensitive fields before returning the user data
+    @PostLoad
+    public void decryptSensitiveFields() {
+        this.email = EncryptData.decrypt(this.email);
+        this.phoneNumber = EncryptData.decrypt(this.phoneNumber);
+        this.address = EncryptData.decrypt(this.address);
+    }
 
     @Override
     public boolean isAccountNonExpired() {
