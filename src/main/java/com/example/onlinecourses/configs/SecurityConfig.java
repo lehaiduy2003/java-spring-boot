@@ -20,10 +20,6 @@ public class SecurityConfig {
                 .requestMatchers("/").permitAll()
                 .anyRequest().authenticated()
             )
-            .formLogin((form) -> form
-                .loginPage("/api/v1/auth/sign-in")
-                .permitAll()
-            )
             .logout(LogoutConfigurer::permitAll);
 
         return http.build();
