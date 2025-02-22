@@ -1,13 +1,44 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <title>OAuth2 Test</title>
+    <!-- Link to external CSS file -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<h1>Welcome to the OAuth2 Test Page</h1>
-<p>Click the button below to log in with Google:</p>
-<a th:href="@{/oauth2/authorization/google}">
-    <button>Login with Google</button>
-</a>
+<div class="container">
+    <h1>Welcome to the OAuth2 Test Page</h1>
+
+    <!-- Basic Authentication Form -->
+    <div class="form-container">
+        <h2>Login with Username/Password</h2>
+        <form method="POST" action="/api/v1/auth/sign-in">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="text" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+
+        <div class="or-divider">
+            <span>or</span>
+        </div>
+
+        <!-- OAuth2 Login with Role Selection -->
+        <h2>Login with Google</h2>
+        <p>Choose your role:</p>
+        <div class="role-buttons">
+            <a th:href="@{/oauth2/authorization/google?role=student}" class="btn btn-student">Login as Student</a>
+            <a th:href="@{/oauth2/authorization/google?role=teacher}" class="btn btn-teacher">Login as Teacher</a>
+        </div>
+    </div>
+</div>
+
+<!-- Link to external JavaScript file -->
+<script th:src="@{/js/script.js}"></script>
 </body>
 </html>
