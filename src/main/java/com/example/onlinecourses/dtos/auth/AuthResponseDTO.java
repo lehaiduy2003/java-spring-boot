@@ -1,4 +1,4 @@
-package com.example.onlinecourses.dtos;
+package com.example.onlinecourses.dtos.auth;
 
 import lombok.*;
 
