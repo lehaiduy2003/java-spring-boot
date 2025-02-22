@@ -13,6 +13,7 @@ import java.util.Set;
 @ToString
 @Entity
 @Table(name = "chapters")
+@Builder
 public class Chapter {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

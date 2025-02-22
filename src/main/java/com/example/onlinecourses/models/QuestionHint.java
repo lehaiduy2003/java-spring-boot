@@ -10,6 +10,7 @@ import lombok.*;
 @ToString
 @Entity
 @Table(name = "question_hints")
+@Builder
 public class QuestionHint {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -6,10 +6,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 
@@ -19,6 +16,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Entity
 @Table(name = "grade_reports")
+@Builder
 public class GradeReport {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

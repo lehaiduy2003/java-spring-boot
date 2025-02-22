@@ -16,6 +16,7 @@ import java.util.List;
 @ToString
 @Entity
 @Table(name = "questions")
+@Builder
 public class Question {
 
     @Id

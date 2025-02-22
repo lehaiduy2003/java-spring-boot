@@ -14,11 +14,12 @@ import java.util.Set;
 @ToString
 @Entity
 @Table(name = "roles")
+@Builder
 public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @NotBlank
     @Column(unique = true, nullable = false)
@@ -26,7 +27,12 @@ public class Role {
     // STUDENT, TEACHER, ADMIN, QUESTION_BANK_MANAGER, COURSE_MANAGER,...
 
     // Mapping the many-to-many relationship between Role and Permission with roles attribute in Permission class
-    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "permissions_roles",
+        joinColumns = @JoinColumn(name = "role_id"),
+        inverseJoinColumns = @JoinColumn(name = "permission_id")
+    )
     private Set<Permission> permissions;
 
     // Mapping the many-to-many relationship between Role and User with roles attribute in User class

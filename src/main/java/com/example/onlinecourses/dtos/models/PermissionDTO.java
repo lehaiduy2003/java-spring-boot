@@ -1,4 +1,4 @@
-package com.example.onlinecourses.dtos;
+package com.example.onlinecourses.dtos.models;
 
 import lombok.*;
 
@@ -7,8 +7,9 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RoleDTO {
-    private int id;
+public class PermissionDTO {
+    private Long id;
     private String name;
+    private String description;
     // Getters and setters
 }

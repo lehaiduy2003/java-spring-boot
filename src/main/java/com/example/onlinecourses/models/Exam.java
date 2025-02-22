@@ -2,10 +2,7 @@ package com.example.onlinecourses.models;
 
 import com.example.onlinecourses.enums.ExamType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -15,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "exams")
+@Builder
 public class Exam {
 
     @Id

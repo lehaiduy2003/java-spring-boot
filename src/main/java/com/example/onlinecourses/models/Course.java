@@ -15,6 +15,7 @@ import java.util.Set;
 @ToString
 @Entity
 @Table(name = "courses")
+@Builder
 public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

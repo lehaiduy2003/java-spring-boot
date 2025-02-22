@@ -1,12 +1,10 @@
 package com.example.onlinecourses.models;
 
-import com.example.onlinecourses.utils.EncryptData;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Date;
@@ -21,20 +19,17 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @ToString
 @Table(name = "users")
-public class User implements UserDetails {
+@Builder
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Size(max = 100)
-    @Column(nullable = false)
     private String password;
 
-    @NotBlank
     @Size(max = 100)
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
     private String username;
 
     private boolean gender;
@@ -43,20 +38,19 @@ public class User implements UserDetails {
     private String bio;
 
     @NotBlank
-    @Email
+    @Email(message = "Email should be valid")
     @Size(max = 100)
     @Column(unique = true, nullable = false)
     private String email;
 
-    @NotBlank
     @Size(max = 11)
-    @Column(unique = true, name = "phone_number", nullable = false)
+    @Column(unique = true, name = "phone_number")
     private String phoneNumber;
 
     @NotBlank
     @Size(max = 120)
-    @Column(name = "full_name", nullable = false)
-    private String fullName;
+    @Column(name = "fullname", nullable = false)
+    private String fullname;
 
     @Size(max = 255)
     private String address;
@@ -86,7 +80,10 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Discussion> discussions;
 
-    @Override
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private Set<OauthProvider> oauthProviders;
+
+    @Transient
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // Return the roles or authorities of the user
         return roles.stream()
@@ -95,41 +92,14 @@ public class User implements UserDetails {
             .collect(Collectors.toList());
     }
 
-    // Encrypt sensitive fields before saving or updating the user data
+    // Encrypt sensitive fields before saving or after updating the user data
     @PrePersist
     @PreUpdate
-    public void encryptSensitiveFields() {
-        this.email = EncryptData.encrypt(this.email);
-        this.phoneNumber = EncryptData.encrypt(this.phoneNumber);
-        this.address = EncryptData.encrypt(this.address);
-    }
+    public void preSave() {
+        if(this.createdAt == null)
+            this.createdAt = new Date();
 
-    // Decrypt sensitive fields before returning the user data
-    @PostLoad
-    public void decryptSensitiveFields() {
-        this.email = EncryptData.decrypt(this.email);
-        this.phoneNumber = EncryptData.decrypt(this.phoneNumber);
-        this.address = EncryptData.decrypt(this.address);
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return UserDetails.super.isAccountNonExpired();
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return UserDetails.super.isAccountNonLocked();
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return UserDetails.super.isCredentialsNonExpired();
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return UserDetails.super.isEnabled();
+        this.updatedAt = new Date();
     }
 
     public void addRole(Role role) {
@@ -201,5 +171,15 @@ public class User implements UserDetails {
         this.exams.clear();
     }
 
-    // Getters and Setters
+
+    public void addOauthProvider(OauthProvider oauthProvider) {
+        this.oauthProviders.add(oauthProvider);
+        oauthProvider.setUser(this);
+    }
+
+    public void removeOauthProvider(OauthProvider oauthProvider) {
+        this.oauthProviders.remove(oauthProvider);
+        oauthProvider.setUser(null);
+    }
+
 }
