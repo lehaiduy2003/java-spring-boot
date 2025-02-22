@@ -1,72 +1,54 @@
 package com.example.onlinecourses.configs;
 
-import jakarta.servlet.http.HttpServletRequest;
+import com.example.onlinecourses.filters.CookieFilter;
+import com.example.onlinecourses.filters.JwtFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
-import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
-import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.function.Consumer;
+import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final ClientRegistrationRepository clientRegistrationRepository;
+    private final OAuth2Config oAuth2Config;
 
-    public SecurityConfig(ClientRegistrationRepository clientRegistrationRepository) {
-        this.clientRegistrationRepository = clientRegistrationRepository;
+    public SecurityConfig(OAuth2Config oAuth2Config) {
+        this.oAuth2Config = oAuth2Config;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            .csrf(AbstractHttpConfigurer::disable) // Disable CSRF
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/", "/public/**").permitAll() // Public endpoints
+                .requestMatchers("/", "/static/**",
+                    "/api/v1/auth/sign-in", "/api/v1/auth/sign-up","/api/v1/auth/sign-out",
+                    "/oauth2/authorization/**").permitAll() // Allow access endpoints
                 .anyRequest().authenticated() // All other endpoints require authentication
             )
             .oauth2Login(oauth2 -> oauth2
                 .authorizationEndpoint(authorization -> authorization
-                    .authorizationRequestResolver(
-                        authorizationRequestResolver(this.clientRegistrationRepository)
-                    )
+                    .authorizationRequestResolver(oAuth2Config.authorizationRequestResolver(null)) // Use the resolver from OAuth2Config
                 )
+                .userInfoEndpoint(userInfo -> userInfo
+                    .userService(oAuth2Config.oauth2UserService()) // Use the OAuth2UserService from OAuth2Config
+                )
+                .successHandler(oAuth2Config.authenticationSuccessHandler()) // Handle role assignment
                 .defaultSuccessUrl("/home", true)
             )
+            .httpBasic(withDefaults()) // Enable basic authentication
             .logout(logout -> logout
                 .logoutSuccessUrl("/").permitAll()
-            );
+            )
+            .addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class)
+            .addFilterAfter(new CookieFilter(), JwtFilter.class);
         return http.build();
     }
 
-    private OAuth2AuthorizationRequestResolver authorizationRequestResolver(
-        ClientRegistrationRepository clientRegistrationRepository) {
-        DefaultOAuth2AuthorizationRequestResolver resolver =
-            new DefaultOAuth2AuthorizationRequestResolver(
-                clientRegistrationRepository,
-                "/oauth2/authorization"
-            );
-
-        resolver.setAuthorizationRequestCustomizer(
-            authorizationRequestCustomizer()
-        );
-
-        return resolver;
-    }
-
-    private Consumer<OAuth2AuthorizationRequest.Builder> authorizationRequestCustomizer() {
-        return customizer -> customizer
-            .additionalParameters(params -> {
-                params.put("prompt", "select_account"); // Force account selection
-            });
-    }
 }
