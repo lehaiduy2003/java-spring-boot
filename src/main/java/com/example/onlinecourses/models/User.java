@@ -3,14 +3,11 @@ package com.example.onlinecourses.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
+
 
 @Setter
 @Getter
@@ -82,15 +79,6 @@ public class User {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<OauthProvider> oauthProviders;
-
-    @Transient
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Return the roles or authorities of the user
-        return roles.stream()
-            .flatMap(role -> role.getPermissions().stream())
-            .map(permission -> new SimpleGrantedAuthority(permission.getName()))
-            .collect(Collectors.toList());
-    }
 
     // Encrypt sensitive fields before saving or after updating the user data
     @PrePersist

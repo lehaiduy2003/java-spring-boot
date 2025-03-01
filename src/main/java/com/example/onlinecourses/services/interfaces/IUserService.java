@@ -1,20 +1,22 @@
-package com.example.onlinecourses.services.Interfaces;
+package com.example.onlinecourses.services.interfaces;
 
-import com.example.onlinecourses.dtos.reqMethod.post.UserCreationDTO;
+import com.example.onlinecourses.dtos.requests.post.UserCreationDTO;
 import com.example.onlinecourses.dtos.models.UserDTO;
-import jakarta.annotation.Nullable;
-import org.springframework.data.domain.Sort;
+import com.example.onlinecourses.dtos.responses.data.UserDataDTO;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 public interface IUserService extends UserDetailsService {
     UserDTO updateById(Long id, UserDTO userDTO);
     UserDTO create(UserCreationDTO userCreationDTO);
-    Boolean deleteByEmail(String email);
-    Boolean deleteByPhoneNumber(String phoneNumber);
+    void deleteByEmail(String email);
+    void deleteByPhoneNumber(String phoneNumber);
+    void deleteByUsername(String username);
     UserDTO updateByEmail(String email, UserDTO userDTO);
     UserDTO updateByPhoneNumber(String phoneNumber, UserDTO userDTO);
     UserDTO findByEmail(String email);
     UserDTO findByPhoneNumber(String phoneNumber);
+    UserDTO findById(Long id);
     UserDTO findByUsername(String username);
-    UserDTO[] findMany(@Nullable Sort sort);
+    UserDataDTO[] findMany(Pageable pageable);
 }

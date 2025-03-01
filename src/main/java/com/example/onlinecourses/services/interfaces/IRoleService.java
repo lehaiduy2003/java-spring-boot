@@ -1,4 +1,4 @@
-package com.example.onlinecourses.services.Interfaces;
+package com.example.onlinecourses.services.interfaces;
 
 import com.example.onlinecourses.models.Role;
 

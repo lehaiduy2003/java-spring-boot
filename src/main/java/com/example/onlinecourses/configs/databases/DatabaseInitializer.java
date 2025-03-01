@@ -1,4 +1,4 @@
-package com.example.onlinecourses.init;
+package com.example.onlinecourses.configs.databases;
 
 import com.example.onlinecourses.models.Permission;
 import com.example.onlinecourses.models.Role;
@@ -6,26 +6,22 @@ import com.example.onlinecourses.models.User;
 import com.example.onlinecourses.repositories.PermissionsRepository;
 import com.example.onlinecourses.repositories.RolesRepository;
 import com.example.onlinecourses.repositories.UsersRepository;
+import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
 @Configuration
+@RequiredArgsConstructor
 public class DatabaseInitializer {
     private final UsersRepository usersRepository;
     private final RolesRepository rolesRepository;
     private final PermissionsRepository permissionsRepository;
-
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
-    public DatabaseInitializer(UsersRepository usersRepository, RolesRepository rolesRepository, PermissionsRepository permissionsRepository) {
-        this.usersRepository = usersRepository;
-        this.rolesRepository = rolesRepository;
-        this.permissionsRepository = permissionsRepository;
-    }
+    private final PasswordEncoder passwordEncoder;
 
     @PostConstruct
     @Transactional
@@ -233,9 +229,10 @@ public class DatabaseInitializer {
 
             // Create default admin user
             User adminUser = User.builder()
-                .email("lehaiduy2003@gmail.com")
-                .password(passwordEncoder.encode("abc123456"))
-                .fullname("Lê Hải Duy")
+                .email(Dotenv.load().get("ADMIN_EMAIL"))
+                .username(Dotenv.load().get("ADMIN_USERNAME"))
+                .password(passwordEncoder.encode(Dotenv.load().get("ADMIN_PASSWORD")))
+                .fullname(Dotenv.load().get("ADMIN_FULLNAME"))
                 .roles(Set.of(adminRole, teacherSimulatorRole, studentSimulatorRole, observerSimulatorRole))
                 .build();
 

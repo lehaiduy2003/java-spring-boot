@@ -1,4 +1,4 @@
-package com.example.onlinecourses.dtos;
+package com.example.onlinecourses.dtos.responses;
 
 import lombok.*;
 
@@ -7,6 +7,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class ApiResponse<T> {
     private boolean success;
     private String message;

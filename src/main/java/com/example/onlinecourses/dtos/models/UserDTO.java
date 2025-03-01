@@ -26,6 +26,6 @@ public class UserDTO {
     private String password;
     private String phoneNumber;
     private boolean gender;
-    private Set<Role> roles;
+    private Set<RoleDTO> roles;
     // Getters and setters
 }

@@ -1,8 +1,9 @@
 package com.example.onlinecourses.services;
 
+import com.example.onlinecourses.exceptions.RoleNotFoundException;
 import com.example.onlinecourses.models.Role;
 import com.example.onlinecourses.repositories.RolesRepository;
-import com.example.onlinecourses.services.Interfaces.IRoleService;
+import com.example.onlinecourses.services.interfaces.IRoleService;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -17,7 +18,7 @@ public class RoleService implements IRoleService {
 
     @Override
     public Role findRoleByName(String roleName) {
-        return rolesRepository.findByName(roleName).orElseThrow(() -> new RuntimeException("Role not found"));
+        return rolesRepository.findByName(roleName).orElseThrow(() -> new RoleNotFoundException("Role not found"));
     }
 
     @Override
@@ -37,7 +38,7 @@ public class RoleService implements IRoleService {
 
     @Override
     public Role updateById(Long id, String roleName) {
-        Role roleToUpdate = rolesRepository.findById(id).orElseThrow(() -> new RuntimeException("Role not found"));
+        Role roleToUpdate = rolesRepository.findById(id).orElseThrow(() -> new RoleNotFoundException("Role not found"));
         roleToUpdate.setName(roleName);
         return rolesRepository.save(roleToUpdate);
     }
