@@ -9,9 +9,9 @@ public enum ExamType {
     MIDTERM("MIDTERM"),
     FINAL("FINAL");
 
-    private final String type;
+    private final String examType;
 
-    ExamType(String type) {
-        this.type = type;
+    ExamType(String examType) {
+        this.examType = examType;
     }
 }

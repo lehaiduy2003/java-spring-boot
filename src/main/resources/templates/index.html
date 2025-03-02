@@ -29,7 +29,12 @@
         </div>
 
         <!-- OAuth2 Login with Role Selection -->
-        <a th:href="@{/oauth2/authorization/google?role}" class="btn btn-student">Login with google</a>
+        <h2>Login with Google</h2>
+        <p>Choose your role:</p>
+        <div class="role-buttons">
+            <a th:href="@{/oauth2/authorization/google?role=student}" class="btn btn-student">Login as Student</a>
+            <a th:href="@{/oauth2/authorization/google?role=teacher}" class="btn btn-teacher">Login as Teacher</a>
+        </div>
     </div>
 </div>
 

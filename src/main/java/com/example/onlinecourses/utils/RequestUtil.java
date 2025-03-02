@@ -7,11 +7,6 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public class RequestUtil {
-
-    private RequestUtil() {
-        throw new IllegalStateException("RequestUtil is a utility class");
-    }
-
     public static Optional<String> extractJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {

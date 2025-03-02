@@ -22,8 +22,6 @@ public class OauthProvider {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
     private String provider;
-    @Column(name = "linked_email", nullable = false)
-    private String linkedEmail;
-    @Column(name = "open_id", nullable = false, unique = true)
-    private String openId;
+    @Column(name = "provider_id", nullable = false, unique = true)
+    private String providerId;
 }

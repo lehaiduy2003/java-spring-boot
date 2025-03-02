@@ -1,12 +1,10 @@
-package com.example.onlinecourses.dtos.requests.post;
+package com.example.onlinecourses.dtos.reqMethod.post;
 
 import com.example.onlinecourses.models.Role;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-import java.util.Date;
 import java.util.Set;
 
 @Getter
@@ -24,6 +22,4 @@ public class UserCreationDTO {
     private String password;
     private String fullname;
     private Set<Role> roles;
-    @Past(message = "Date of birth must be in the past")
-    private Date dob;
 }

@@ -1,26 +1,25 @@
 package com.example.onlinecourses.controllers;
-import com.example.onlinecourses.dtos.responses.ApiResponse;
+import com.example.onlinecourses.dtos.ApiResponse;
 import com.example.onlinecourses.dtos.auth.AuthRequestDTO;
 import com.example.onlinecourses.dtos.auth.AuthResponseDTO;
-import com.example.onlinecourses.dtos.requests.post.UserCreationDTO;
-import com.example.onlinecourses.services.interfaces.IAuthService;
-import com.example.onlinecourses.utils.CookieUtil;
+import com.example.onlinecourses.dtos.reqMethod.post.UserCreationDTO;
+import com.example.onlinecourses.services.Interfaces.IAuthService;
+import io.github.cdimascio.dotenv.Dotenv;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthController {
     private final IAuthService authService;
-    private static final String REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
+    private final boolean isSecure = Dotenv.load().get("ENV").equals("production");
 
     public AuthController(IAuthService authService) {
         this.authService = authService;
@@ -28,40 +27,70 @@ public class AuthController {
 
     @PostMapping("/sign-in")
     public ResponseEntity<ApiResponse<AuthResponseDTO>> signIn(@RequestBody AuthRequestDTO authRequestDTO, HttpServletResponse response, HttpSession httpSession) {
-        AuthResponseDTO authResponseDTO = authService.signIn(authRequestDTO);
-        // Set session attribute
-        httpSession.setAttribute("userId", authResponseDTO.getUser().getId());
-        CookieUtil.setCookies(response, REFRESH_TOKEN_COOKIE_NAME, authResponseDTO.getRefreshToken());
-        return ResponseEntity.status(200).body(new ApiResponse<>(true, "Sign in successful", authResponseDTO));
+        try {
+            AuthResponseDTO authResponseDTO = authService.signIn(authRequestDTO);
+
+            // Set session attribute
+            httpSession.setAttribute("userId", authResponseDTO.getUserId());
+
+            setCookies(response, authResponseDTO.getRefreshToken());
+
+            return ResponseEntity.ok(new ApiResponse<>(true, "Sign in successful", authResponseDTO));
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(false, e.getMessage(), null));
+        }
     }
 
     @PostMapping("/sign-up")
     public ResponseEntity<ApiResponse<AuthResponseDTO>> signUp(@Valid @RequestBody UserCreationDTO userCreationDTO, HttpServletResponse response, HttpSession httpSession) {
-        AuthResponseDTO authResponseDTO = authService.signUp(userCreationDTO);
-        // Set session attribute
-        httpSession.setAttribute("userId", authResponseDTO.getUser().getId());
-        CookieUtil.setCookies(response, REFRESH_TOKEN_COOKIE_NAME, authResponseDTO.getRefreshToken());
-        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(true, "Sign up successful", authResponseDTO));
+        try {
+            AuthResponseDTO authResponseDTO = authService.signUp(userCreationDTO);
+
+            // Set session attribute
+            httpSession.setAttribute("userId", authResponseDTO.getUserId());
+
+            setCookies(response, authResponseDTO.getRefreshToken());
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(true, "Sign up successful", authResponseDTO));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(false, e.getMessage(), null));
+        }
     }
 
     @PostMapping("/sign-out")
-    public ResponseEntity<ApiResponse<Object>> signOut(@RequestAttribute(name = REFRESH_TOKEN_COOKIE_NAME) String refreshToken, HttpServletResponse response) {
-        // Delete refresh token cookie
-        authService.signOut(refreshToken);
-        CookieUtil.deleteCookies(response, REFRESH_TOKEN_COOKIE_NAME);
+    public ResponseEntity<ApiResponse<?>> signOut(HttpServletResponse response) {
+        // Xóa refresh token cookie
+        Cookie cookie = new Cookie("refreshToken", null);
+        cookie.setMaxAge(0);
+        cookie.setPath("/api/v1/auth/refresh");
+        response.addCookie(cookie);
+
         return ResponseEntity.ok(new ApiResponse<>(true, "Sign out successful", null));
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<ApiResponse<Map<String, String>>> refreshToken(
-        @CookieValue(name = REFRESH_TOKEN_COOKIE_NAME, required = false) String refreshToken) {
-        Map<String, String> responseBody = new HashMap<>();
+    public ResponseEntity<ApiResponse<String>> refreshToken(
+        @CookieValue(name = "refreshToken", required = false) String refreshToken) {
         if (refreshToken == null) {
             return ResponseEntity.status(401).body(new ApiResponse<>(false, "Refresh token not found", null));
         }
-        String newAccessToken = authService.refreshAccessToken(refreshToken);
-        responseBody.put("accessToken", newAccessToken);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Token refreshed successfully", responseBody));
+
+        try {
+            String newAccessToken = authService.refreshAccessToken(refreshToken);
+
+            return ResponseEntity.ok(new ApiResponse<>(true, "Token refreshed successfully", newAccessToken));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body(new ApiResponse<>(false, e.getMessage(), null));
+        }
     }
 
+    private void setCookies(HttpServletResponse response, String refreshToken) {
+        // Set refresh token cookie
+        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setSecure(isSecure);
+        refreshTokenCookie.setPath("/api/v1/auth/refresh"); // only send to /api/v1/auth/refresh endpoint
+        response.addCookie(refreshTokenCookie);
+    }
 }

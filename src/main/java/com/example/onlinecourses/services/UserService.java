@@ -1,15 +1,17 @@
 package com.example.onlinecourses.services;
-import com.example.onlinecourses.dtos.requests.post.UserCreationDTO;
+
+
+import com.example.onlinecourses.dtos.reqMethod.post.UserCreationDTO;
 import com.example.onlinecourses.dtos.models.UserDTO;
-import com.example.onlinecourses.dtos.responses.data.UserDataDTO;
-import com.example.onlinecourses.exceptions.ResourceAlreadyExistException;
 import com.example.onlinecourses.mappers.UserMapper;
 import com.example.onlinecourses.models.Role;
 import com.example.onlinecourses.models.User;
-import com.example.onlinecourses.services.interfaces.IRoleService;
-import com.example.onlinecourses.services.interfaces.IUserService;
-import com.example.onlinecourses.configs.impls.UserDetailsImpl;
-import org.springframework.data.domain.Pageable;
+import com.example.onlinecourses.services.Interfaces.IRoleService;
+import com.example.onlinecourses.services.Interfaces.IUserService;
+import com.example.onlinecourses.specifications.UserDetailsImpl;
+import com.example.onlinecourses.specifications.UserSpecification;
+import jakarta.annotation.Nullable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -32,18 +34,9 @@ public class UserService implements IUserService {
 
     @Override
     public UserDetails loadUserByUsername(String identifier) throws UsernameNotFoundException {
-        User user = usersRepository.findUserByEmailOrUsername(identifier, identifier)
+        User user = usersRepository.findByEmailOrUsernameOrPhoneNumber(identifier, identifier, identifier)
             .orElseThrow(() -> new UsernameNotFoundException("User not found with: " + identifier));
-        return new UserDetailsImpl(
-            user.getId(),
-            user.getEmail(),
-            user.getPhoneNumber(),
-            user.getUsername(),
-            user.getPassword(),
-            true,
-            user.getOauthProviders(),
-            user.getRoles()
-        );
+        return new UserDetailsImpl(user.getId(), user.getEmail(), user.getPhoneNumber(), user.getUsername(), user.getPassword(), true, user.getRoles());
     }
 
     @Override
@@ -54,50 +47,43 @@ public class UserService implements IUserService {
         return update(user, userDTO);
     }
 
-
     @Override
-    public UserDTO create(UserCreationDTO userCreationDTO) {
-        if(isEmailExist(userCreationDTO.getEmail()))
-            throw new ResourceAlreadyExistException("User with email " + userCreationDTO.getEmail() + " already exists");
+    public UserDTO create(UserCreationDTO userCreationDTO) throws IllegalArgumentException {
+        if(isEmailExist(userCreationDTO.getEmail()) || isPhoneNumberExist(userCreationDTO.getPhoneNumber()) || isUsernameExist(userCreationDTO.getUsername())) {
+            throw new IllegalArgumentException("User already exists");
+        }
         // query roles by name
         Set<String> roleNames = userCreationDTO.getRoles().stream()
             .map(Role::getName)
             .collect(Collectors.toSet());
         Set<Role> roles = roleService.findRolesByNames(roleNames);
         userCreationDTO.setRoles(roles);
-        User user = UserMapper.INSTANCE.toEntity(userCreationDTO);
+        User user = UserMapper.INSTANCE.createUser(userCreationDTO);
         usersRepository.save(user);
         return UserMapper.INSTANCE.toDTO(user);
     }
 
     @Override
-    public void deleteByEmail(String email) {
-        if(!isEmailExist(email)) {
-            throw new UsernameNotFoundException("User not found with email: " + email);
-        }
-        usersRepository.deleteUserByEmail(email);
+    public Boolean deleteByEmail(String email) throws IllegalArgumentException {
+        // Check if user exists
+        // Already implemented encryption in findByEmail method
+        findByEmail(email);
+        usersRepository.delete(UserSpecification.hasEmail(email));
+        return true;
     }
 
     @Override
-    public void deleteByUsername(String username) {
-        if(!isUsernameExist(username)) {
-            throw new UsernameNotFoundException("User not found with username: " + username);
-        }
-        usersRepository.deleteUserByUsername(username);
+    public Boolean deleteByPhoneNumber(String phoneNumber) throws IllegalArgumentException {
+        // Already implemented encryption in findByEmail method
+        findByPhoneNumber(phoneNumber);
+        usersRepository.delete(UserSpecification.hasEmail(phoneNumber));
+        return true;
     }
 
     @Override
-    public void deleteByPhoneNumber(String phoneNumber) {
-        if(!isPhoneNumberExist(phoneNumber)) {
-            throw new UsernameNotFoundException("User not found with phone number: " + phoneNumber);
-        }
-        usersRepository.deleteUserByPhoneNumber(phoneNumber);
-    }
-
-    @Override
-    public UserDTO updateByEmail(String email, UserDTO userDTO) {
+    public UserDTO updateByEmail(String email, UserDTO userDTO) throws IllegalArgumentException {
         UserDTO foundUser = findByEmail(email);
-        User user = UserMapper.INSTANCE.toEntity(foundUser);
+        User user = UserMapper.INSTANCE.toUser(foundUser);
 
         return update(user, userDTO);
     }
@@ -110,8 +96,6 @@ public class UserService implements IUserService {
         user.setAvatar(userDTO.getAvatar());
         user.setDob(userDTO.getDob());
         user.setGender(userDTO.isGender());
-        user.setPhoneNumber(userDTO.getPhoneNumber());
-        user.setUsername(userDTO.getUsername());
 
         User updatedUser = usersRepository.save(user);
         return UserMapper.INSTANCE.toDTO(updatedUser);
@@ -120,65 +104,50 @@ public class UserService implements IUserService {
     @Override
     public UserDTO updateByPhoneNumber(String phoneNumber, UserDTO userDTO) {
         UserDTO foundUser = findByPhoneNumber(phoneNumber);
-        User user = UserMapper.INSTANCE.toEntity(foundUser);
+        User user = UserMapper.INSTANCE.toUser(foundUser);
 
         return update(user, userDTO);
     }
 
-    // Throws IllegalArgumentException if the email is not valid format
     @Override
-    public UserDTO findByEmail(String email) throws IllegalArgumentException {
-        User user = usersRepository.findUserByEmail(email)
+    public UserDTO findByEmail(String email) {
+        User user = usersRepository.findOne(UserSpecification.hasEmail(email))
             .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
         return UserMapper.INSTANCE.toDTO(user);
     }
 
-    // Throws IllegalArgumentException if the phone number is not valid format
     @Override
-    public UserDTO findByPhoneNumber(String phoneNumber) throws IllegalArgumentException {
-        User user = usersRepository.findUserByPhoneNumber(phoneNumber)
+    public UserDTO findByPhoneNumber(String phoneNumber) {
+        User user = usersRepository.findOne(UserSpecification.hasPhoneNumber(phoneNumber))
             .orElseThrow(() -> new UsernameNotFoundException("User not found with phone number: " + phoneNumber));
 
         return UserMapper.INSTANCE.toDTO(user);
     }
 
-    // Throws IllegalArgumentException if the username is not valid format
     @Override
-    public UserDTO findByUsername(String username) throws IllegalArgumentException {
-        User user = usersRepository.findUserByUsername(username)
+    public UserDTO findByUsername(String username) {
+        User user = usersRepository.findOne(UserSpecification.hasUsername(username))
             .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
         return UserMapper.INSTANCE.toDTO(user);
     }
 
-
     @Override
-    public UserDataDTO[] findMany(Pageable pageable) {
-        List<User> users = usersRepository.findAll(pageable).getContent();
-        return users.stream()
-            .map(UserMapper.INSTANCE::toUserDataDTO)
-            .toArray(UserDataDTO[]::new);
+    public UserDTO[] findMany(@Nullable Sort sort) {
+        List<User> users = usersRepository.findAll(sort);
+        return users.stream().map(UserMapper.INSTANCE::toDTO).toArray(UserDTO[]::new);
     }
 
-    @Override
-    public UserDTO findById(Long id) {
-        User user = usersRepository.findById(id)
-            .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
-        return UserMapper.INSTANCE.toDTO(user);
+
+    private boolean isEmailExist(String email) {
+        return usersRepository.exists(UserSpecification.hasEmail(email));
     }
 
-    // throws IllegalArgumentException if the email is not valid format
-    private boolean isEmailExist(String email)  throws IllegalArgumentException {
-        return usersRepository.existsUserByEmail(email);
+    private boolean isPhoneNumberExist(String phoneNumber) {
+        return usersRepository.exists(UserSpecification.hasPhoneNumber(phoneNumber));
     }
 
-    // throws IllegalArgumentException if the phone number is not valid format
-    private boolean isPhoneNumberExist(String phoneNumber)  throws IllegalArgumentException {
-        return usersRepository.existsUserByPhoneNumber(phoneNumber);
-    }
-
-    // throws IllegalArgumentException if the username is not valid format
-    private boolean isUsernameExist(String username)  throws IllegalArgumentException {
-        return usersRepository.existsUserByUsername(username);
+    private boolean isUsernameExist(String username) {
+        return usersRepository.exists(UserSpecification.hasUsername(username));
     }
 }

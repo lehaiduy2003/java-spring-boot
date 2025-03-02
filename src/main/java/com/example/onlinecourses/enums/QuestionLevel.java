@@ -9,9 +9,9 @@ public enum QuestionLevel {
     APPLICATION("APPLICATION"),
     ADVANCED("ADVANCED");
 
-    private final String level;
+    private final String questionLevel;
 
-    QuestionLevel(String level) {
-        this.level = level;
+    QuestionLevel(String questionLevel) {
+        this.questionLevel = questionLevel;
     }
 }

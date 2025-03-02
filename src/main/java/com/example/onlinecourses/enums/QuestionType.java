@@ -9,9 +9,9 @@ public enum QuestionType {
     SHORT_ANSWER("SHORT_ANSWER"),
     ESSAY("ESSAY");
 
-    private final String type;
+    private final String questionType;
 
-    QuestionType(String type) {
-        this.type = type;
+    QuestionType(String questionType) {
+        this.questionType = questionType;
     }
 }

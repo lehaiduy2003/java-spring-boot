@@ -2,8 +2,6 @@ package com.example.onlinecourses.dtos.models;
 
 import lombok.*;
 
-import java.util.Set;
-
 @Getter
 @Setter
 @Builder
@@ -12,6 +10,5 @@ import java.util.Set;
 public class RoleDTO {
     private Long id;
     private String name;
-    private Set<PermissionDTO> permissions;
     // Getters and setters
 }

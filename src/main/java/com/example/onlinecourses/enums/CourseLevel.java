@@ -16,9 +16,9 @@ public enum CourseLevel {
     EXPERT("EXPERT"),
     ENGINEERING("ENGINEERING");
 
-    private final String level;
+    private final String courseLevel;
 
-    CourseLevel(String level) {
-        this.level = level;
+    CourseLevel(String courseLevel) {
+        this.courseLevel = courseLevel;
     }
 }
