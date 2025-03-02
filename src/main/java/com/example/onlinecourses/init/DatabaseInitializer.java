@@ -6,6 +6,7 @@ import com.example.onlinecourses.models.User;
 import com.example.onlinecourses.repositories.PermissionsRepository;
 import com.example.onlinecourses.repositories.RolesRepository;
 import com.example.onlinecourses.repositories.UsersRepository;
+import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -233,9 +234,10 @@ public class DatabaseInitializer {
 
             // Create default admin user
             User adminUser = User.builder()
-                .email("lehaiduy2003@gmail.com")
-                .password(passwordEncoder.encode("abc123456"))
-                .fullname("Lê Hải Duy")
+                .email(Dotenv.load().get("ADMIN_EMAIL"))
+                .username(Dotenv.load().get("ADMIN_USERNAME"))
+                .password(passwordEncoder.encode(Dotenv.load().get("ADMIN_PASSWORD")))
+                .fullname(Dotenv.load().get("ADMIN_FULLNAME"))
                 .roles(Set.of(adminRole, teacherSimulatorRole, studentSimulatorRole, observerSimulatorRole))
                 .build();
 
