@@ -1,5 +1,6 @@
 package com.example.onlinecourses.dtos.auth;
 
+import com.example.onlinecourses.dtos.responses.data.UserDataDTO;
 import lombok.*;
 
 @Getter
@@ -8,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthResponseDTO {
-    private Long userId;
+    private UserDataDTO user;
     private String accessToken;
     private String refreshToken;
 }
