@@ -1,13 +1,14 @@
 package com.example.onlinecourses.controllers;
 
-import com.example.onlinecourses.dtos.ApiResponse;
-import com.example.onlinecourses.dtos.reqMethod.post.UserCreationDTO;
+import com.example.onlinecourses.dtos.responses.ApiResponse;
+import com.example.onlinecourses.dtos.requests.post.UserCreationDTO;
 import com.example.onlinecourses.dtos.models.UserDTO;
-import com.example.onlinecourses.services.Interfaces.IUserService;
+import com.example.onlinecourses.dtos.responses.data.UserDataDTO;
+import com.example.onlinecourses.services.interfaces.IUserService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,63 +17,47 @@ public class UserController {
 
     private final IUserService userService;
 
-    @Autowired
     public UserController(IUserService userService) {
         this.userService = userService;
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse<UserDTO>> createUser(@Valid @RequestBody UserCreationDTO userCreationDTO) {
-        try {
-            UserDTO createdUserDTO = userService.create(userCreationDTO);
-            return ResponseEntity.status(201).body(new ApiResponse<>(true, "User created successfully", createdUserDTO));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(new ApiResponse<>(false, e.getMessage(), null));
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(new ApiResponse<>(false, "An error occurred", null));
-        }
+        UserDTO createdUserDTO = userService.create(userCreationDTO);
+        return ResponseEntity.status(201).body(new ApiResponse<>(true, "User created successfully", createdUserDTO));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<UserDTO>> updateUserById(@Valid @PathVariable Long id, @RequestBody UserDTO userDTO) {
-        try {
-            UserDTO updatedUserDTO = userService.updateById(id, userDTO);
-            return ResponseEntity.ok(new ApiResponse<>(true, "User updated successfully", updatedUserDTO));
-        } catch (UsernameNotFoundException e) {
-            return ResponseEntity.badRequest().body(new ApiResponse<>(false, e.getMessage(), null));
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(new ApiResponse<>(false, "An error occurred", null));
-        }
+        UserDTO updatedUserDTO = userService.updateById(id, userDTO);
+        return ResponseEntity.ok(new ApiResponse<>(true, "User updated successfully", updatedUserDTO));
     }
 
     @DeleteMapping("/{email}")
     public ResponseEntity<ApiResponse<Boolean>> deleteUserByEmail(@PathVariable String email) {
-        try {
-            Boolean isDeleted = userService.deleteByEmail(email);
-            ApiResponse<Boolean> response;
-            return ResponseEntity.ok(new ApiResponse<>(true, "User deleted successfully", null));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(new ApiResponse<>(false, e.getMessage(), null));
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(new ApiResponse<>(false, "An error occurred", null));
-        }
+        userService.deleteByEmail(email);
+        return ResponseEntity.ok(new ApiResponse<>(true, "User deleted successfully", true));
     }
 
-    @GetMapping("/{email}")
-    public ResponseEntity<ApiResponse<UserDTO>> getUserByEmail(@PathVariable String email) {
-        try {
-            UserDTO userDTO = userService.findByEmail(email);
-            return ResponseEntity.ok(new ApiResponse<>(true, "User data found", userDTO));
-        } catch (UsernameNotFoundException e) {
-            return ResponseEntity.badRequest().body(new ApiResponse<>(false, e.getMessage(), null));
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(new ApiResponse<>(false, "An error occurred", null));
-        }
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<UserDTO>> getUserByEmail(@RequestParam(name = "email") String email) {
+        UserDTO userDTO = userService.findByEmail(email);
+        return ResponseEntity.ok(new ApiResponse<>(true, "User data found", userDTO));
     }
 
     @GetMapping
-    public ResponseEntity<UserDTO[]> getAllUsers() {
-        UserDTO[] userDTOS = userService.findMany(null);
-        return ResponseEntity.ok(userDTOS);
+    public ResponseEntity<ApiResponse<UserDataDTO[]>> getAllUsers(
+        @RequestParam(name = "page", defaultValue = "0") int page,
+        @RequestParam(name = "size", defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        UserDataDTO[] userDTOS = userService.findMany(pageable);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Users data found", userDTOS));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<UserDTO>> getUserById(@PathVariable Long id) {
+        UserDTO userDTO = userService.findById(id);
+        return ResponseEntity.ok(new ApiResponse<>(true, "User data found", userDTO));
     }
 }
