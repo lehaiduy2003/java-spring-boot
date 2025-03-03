@@ -7,6 +7,7 @@ This project is an API for managing online courses, built with Java, Spring Boot
 - Java
 - Spring Boot
 - Maven
+- Thymeleaf
 - Swagger
 - LogBack
 - Mockito
