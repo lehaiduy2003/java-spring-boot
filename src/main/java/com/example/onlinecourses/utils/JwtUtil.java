@@ -6,10 +6,7 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import javax.crypto.SecretKey;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class JwtUtil {
@@ -27,13 +24,23 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     }
 
+    // Convert roles to list of strings
+    private static List<String> getUserRoles(User user) {
+        List<String> roles = new ArrayList<>();
+        Set<Role> userRoles = user.getRoles();
+        if(userRoles != null) {
+            roles = userRoles.stream()
+                .map(Role::getName)
+                .toList();
+        }
+        return roles;
+    }
+
     public static String generateAccessToken(User user) {
-        List<Role> roles = new ArrayList<>();
-        if(user.getRoles() == null) {
-            Role role = Role.builder()
-                .name("GUEST")
-                .build();
-            roles.add(role);
+        List<String> roles = getUserRoles(user);
+        // Set default role as GUEST if user has no roles
+        if(roles.isEmpty()) {
+            roles.add("GUEST");
         }
         return Jwts.builder()
             .subject(user.getEmail())
