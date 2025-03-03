@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -26,6 +27,7 @@ public class OAuth2Config {
     private final UsersRepository usersRepository;
     private final OAuth2ProviderRepository oAuth2ProviderRepository;
     private final OAuthSuccessHandler oAuthSuccessHandler;
+    private final OAuth2AuthorizedClientService authorizedClientService;
 
     @Bean
     public OAuth2AuthorizationRequestResolver authorizationRequestResolver(ClientRegistrationRepository clientRegistrationRepository) {
@@ -41,16 +43,16 @@ public class OAuth2Config {
     // So the user can select an account to sign in with every time
     private Consumer<OAuth2AuthorizationRequest.Builder> authorizationRequestCustomizer() {
         return customizer -> customizer
-            .additionalParameters(params -> {
-                params.put("prompt", "select_account"); // Force account selection
-            });
+            .additionalParameters(params ->
+                params.put("prompt", "select_account") // Force account selection
+            );
     }
 
     // OAuth2UserService bean for handling OAuth2 user details
     @Bean
     public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService() {
         return new BaseOAuthService(
-            usersRepository, oAuth2ProviderRepository
+            usersRepository, oAuth2ProviderRepository, authorizedClientService
         );
     }
 }

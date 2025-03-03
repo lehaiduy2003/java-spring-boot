@@ -26,4 +26,5 @@ public class OauthProvider {
     private String linkedEmail;
     @Column(name = "open_id", nullable = false, unique = true)
     private String openId;
+    private String token;
 }

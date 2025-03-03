@@ -1,7 +1,10 @@
 package com.example.onlinecourses.controllers;
 import com.example.onlinecourses.dtos.auth.AuthResponseDTO;
-import com.example.onlinecourses.dtos.responses.ApiResponse;
+import com.example.onlinecourses.dtos.responses.ApiResponseDTO;
 import com.example.onlinecourses.services.interfaces.IOAuth2Service;
+import com.example.onlinecourses.utils.CookieUtil;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,9 +33,10 @@ public class OAuthController {
     }
 
     @GetMapping("/api/v1/oauth2/callback")
-    public ResponseEntity<ApiResponse<AuthResponseDTO>> handleCallback(OAuth2AuthenticationToken oAuthToken) {
+    public ResponseEntity<ApiResponseDTO<AuthResponseDTO>> handleCallback(OAuth2AuthenticationToken oAuthToken, HttpServletResponse response, HttpSession httpSession) {
         AuthResponseDTO authDTO = oAuth2ClientService.continueWithOAuth(oAuthToken);
-        return ResponseEntity.ok(new ApiResponse<>(true, "User logged in successfully", authDTO));
+        httpSession.setAttribute("userId", authDTO.getUser().getId());
+        CookieUtil.setCookies(response, "refreshToken", authDTO.getRefreshToken());
+        return ResponseEntity.ok(new ApiResponseDTO<>(true, "User logged in successfully", authDTO));
     }
-
 }
