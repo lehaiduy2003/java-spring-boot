@@ -29,6 +29,7 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
             provider
         );
         SecurityContextUtil.setSecurityContext(newAuthentication);
+        // Redirect to the callback endpoint to handle the OAuth2 user details (e.g. save to the database)
         getRedirectStrategy().sendRedirect(request, response, "/api/v1/oauth2/callback");
     }
 }
