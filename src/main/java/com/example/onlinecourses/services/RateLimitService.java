@@ -19,12 +19,13 @@ public class RateLimitService implements IRateLimitService {
         String key = "RATE_LIMIT:" + clientIp;
         Long count = redisTemplate.opsForValue().increment(key);
 
+        // init count to 0 if it's a new key
         if (count == null) {
             count = 0L;
         }
 
         if (count == 1) {
-            // reset time (second)
+            // reset time (second) for new key
             long windowTime = 60;
             redisTemplate.expire(key, windowTime, TimeUnit.SECONDS);
         }
