@@ -1,6 +1,6 @@
 package com.example.onlinecourses.controllers;
 
-import com.example.onlinecourses.dtos.responses.ApiResponse;
+import com.example.onlinecourses.dtos.responses.ApiResponseDTO;
 import com.example.onlinecourses.dtos.requests.post.UserCreationDTO;
 import com.example.onlinecourses.dtos.models.UserDTO;
 import com.example.onlinecourses.dtos.responses.data.UserDataDTO;
@@ -22,42 +22,42 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<UserDTO>> createUser(@Valid @RequestBody UserCreationDTO userCreationDTO) {
+    public ResponseEntity<ApiResponseDTO<UserDTO>> createUser(@Valid @RequestBody UserCreationDTO userCreationDTO) {
         UserDTO createdUserDTO = userService.create(userCreationDTO);
-        return ResponseEntity.status(201).body(new ApiResponse<>(true, "User created successfully", createdUserDTO));
+        return ResponseEntity.status(201).body(new ApiResponseDTO<>(true, "User created successfully", createdUserDTO));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<UserDTO>> updateUserById(@Valid @PathVariable Long id, @RequestBody UserDTO userDTO) {
+    public ResponseEntity<ApiResponseDTO<UserDTO>> updateUserById(@Valid @PathVariable Long id, @RequestBody UserDTO userDTO) {
         UserDTO updatedUserDTO = userService.updateById(id, userDTO);
-        return ResponseEntity.ok(new ApiResponse<>(true, "User updated successfully", updatedUserDTO));
+        return ResponseEntity.ok(new ApiResponseDTO<>(true, "User updated successfully", updatedUserDTO));
     }
 
     @DeleteMapping("/{email}")
-    public ResponseEntity<ApiResponse<Boolean>> deleteUserByEmail(@PathVariable String email) {
+    public ResponseEntity<ApiResponseDTO<Boolean>> deleteUserByEmail(@PathVariable String email) {
         userService.deleteByEmail(email);
-        return ResponseEntity.ok(new ApiResponse<>(true, "User deleted successfully", true));
+        return ResponseEntity.ok(new ApiResponseDTO<>(true, "User deleted successfully", true));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse<UserDTO>> getUserByEmail(@RequestParam(name = "email") String email) {
+    public ResponseEntity<ApiResponseDTO<UserDTO>> getUserByEmail(@RequestParam(name = "email") String email) {
         UserDTO userDTO = userService.findByEmail(email);
-        return ResponseEntity.ok(new ApiResponse<>(true, "User data found", userDTO));
+        return ResponseEntity.ok(new ApiResponseDTO<>(true, "User data found", userDTO));
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<UserDataDTO[]>> getAllUsers(
+    public ResponseEntity<ApiResponseDTO<UserDataDTO[]>> getAllUsers(
         @RequestParam(name = "page", defaultValue = "0") int page,
         @RequestParam(name = "size", defaultValue = "10") int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
         UserDataDTO[] userDTOS = userService.findMany(pageable);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Users data found", userDTOS));
+        return ResponseEntity.ok(new ApiResponseDTO<>(true, "Users data found", userDTOS));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<UserDTO>> getUserById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponseDTO<UserDTO>> getUserById(@PathVariable Long id) {
         UserDTO userDTO = userService.findById(id);
-        return ResponseEntity.ok(new ApiResponse<>(true, "User data found", userDTO));
+        return ResponseEntity.ok(new ApiResponseDTO<>(true, "User data found", userDTO));
     }
 }

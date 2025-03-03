@@ -60,11 +60,15 @@ public class UserService implements IUserService {
         if(isEmailExist(userCreationDTO.getEmail()))
             throw new ResourceAlreadyExistException("User with email " + userCreationDTO.getEmail() + " already exists");
         // query roles by name
-        Set<String> roleNames = userCreationDTO.getRoles().stream()
-            .map(Role::getName)
-            .collect(Collectors.toSet());
-        Set<Role> roles = roleService.findRolesByNames(roleNames);
-        userCreationDTO.setRoles(roles);
+        Set<Role> roles; // set roles to empty set
+        // if roles is not null, map the roles to role names and query the roles by names
+        if(userCreationDTO.getRoles() != null) {
+            Set<String> roleNames = userCreationDTO.getRoles().stream()
+                .map(Role::getName)
+                .collect(Collectors.toSet());
+            roles = roleService.findRolesByNames(roleNames);
+            userCreationDTO.setRoles(roles);
+        }
         User user = UserMapper.INSTANCE.toEntity(userCreationDTO);
         usersRepository.save(user);
         return UserMapper.INSTANCE.toDTO(user);
