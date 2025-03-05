@@ -29,7 +29,7 @@ public class RateLimitService implements IRateLimitService {
             long windowTime = 60;
             redisTemplate.expire(key, windowTime, TimeUnit.SECONDS);
         }
-        final int MAX_REQUESTS = 10;
+        final int MAX_REQUESTS = 20;
         return count <= MAX_REQUESTS;
     }
 }
