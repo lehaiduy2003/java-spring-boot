@@ -38,7 +38,7 @@ public class AuthController {
 
     @PostMapping("/sign-up")
     @AuthSwagger.SignUp
-    public ResponseEntity<ApiResponseDTO<AuthResponseDTO>> signUp(@Valid @RequestBody UserCreationDTO userCreationDTO, HttpServletResponse response, HttpSession httpSession) {
+    public ResponseEntity<ApiResponseDTO<AuthResponseDTO>> signUp(@Valid UserCreationDTO userCreationDTO, HttpServletResponse response, HttpSession httpSession) {
         AuthResponseDTO authResponseDTO = authService.signUp(userCreationDTO);
         // Set session attribute
         httpSession.setAttribute("userId", authResponseDTO.getUser().getId());
