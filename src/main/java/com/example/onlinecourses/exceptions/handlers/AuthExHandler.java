@@ -15,22 +15,22 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class AuthExHandler {
     @ExceptionHandler(ExpiredJwtException.class)
-    public ResponseEntity<ApiResponseDTO<String>> handleExpiredJwtException(ExpiredJwtException e) {
-        return ResponseEntity.status(401).body(new ApiResponseDTO<>(false, e.getMessage(), null));
+    public ResponseEntity<ApiResponseDTO<Throwable>> handleExpiredJwtException(ExpiredJwtException e) {
+        return ResponseEntity.status(401).body(new ApiResponseDTO<>(false, e.getMessage(), e.getCause()));
     }
 
     @ExceptionHandler(MalformedJwtException.class)
-    public ResponseEntity<ApiResponseDTO<String>> handleInvalidTokenException(MalformedJwtException e) {
-        return ResponseEntity.status(401).body(new ApiResponseDTO<>(false, e.getMessage(), null));
+    public ResponseEntity<ApiResponseDTO<Throwable>> handleInvalidTokenException(MalformedJwtException e) {
+        return ResponseEntity.status(401).body(new ApiResponseDTO<>(false, e.getMessage(), e.getCause()));
     }
 
     @ExceptionHandler(UnsupportedJwtException.class)
-    public ResponseEntity<ApiResponseDTO<String>> handleUnsupportedJwtException(UnsupportedJwtException e) {
-        return ResponseEntity.status(401).body(new ApiResponseDTO<>(false, e.getMessage(), null));
+    public ResponseEntity<ApiResponseDTO<Throwable>> handleUnsupportedJwtException(UnsupportedJwtException e) {
+        return ResponseEntity.status(401).body(new ApiResponseDTO<>(false, e.getMessage(), e.getCause()));
     }
 
     @ExceptionHandler(NoPermissionException.class)
-    public ResponseEntity<ApiResponseDTO<String>> handleNoPermissionException(NoPermissionException e) {
-        return ResponseEntity.status(403).body(new ApiResponseDTO<>(false, e.getMessage(), null));
+    public ResponseEntity<ApiResponseDTO<Throwable>> handleNoPermissionException(NoPermissionException e) {
+        return ResponseEntity.status(403).body(new ApiResponseDTO<>(false, e.getMessage(), e.getCause()));
     }
 }

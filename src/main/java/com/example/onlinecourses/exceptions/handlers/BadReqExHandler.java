@@ -17,42 +17,42 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class BadReqExHandler {
     @ExceptionHandler(PasswordNotMatchException.class)
-    public ResponseEntity<ApiResponseDTO<String>> handlePasswordNotMatchException(PasswordNotMatchException e) {
-        return ResponseEntity.status(400).body(new ApiResponseDTO<>(false, e.getMessage(), null));
+    public ResponseEntity<ApiResponseDTO<Throwable>> handlePasswordNotMatchException(PasswordNotMatchException e) {
+        return ResponseEntity.status(400).body(new ApiResponseDTO<>(false, e.getMessage(), e.getCause()));
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<ApiResponseDTO<String>> handleUsernameNotFoundException(UsernameNotFoundException e) {
-        return ResponseEntity.status(400).body(new ApiResponseDTO<>(false, e.getMessage(), null));
+    public ResponseEntity<ApiResponseDTO<Throwable>> handleUsernameNotFoundException(UsernameNotFoundException e) {
+        return ResponseEntity.status(400).body(new ApiResponseDTO<>(false, e.getMessage(), e.getCause()));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ApiResponseDTO<String>> handleIllegalArgumentException(IllegalArgumentException e) {
-        return ResponseEntity.status(400).body(new ApiResponseDTO<>(false, e.getMessage(), null));
+    public ResponseEntity<ApiResponseDTO<Throwable>> handleIllegalArgumentException(IllegalArgumentException e) {
+        return ResponseEntity.status(400).body(new ApiResponseDTO<>(false, e.getMessage(), e.getCause()));
     }
 
     @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<ApiResponseDTO<String>> handleIllegalStateException(IllegalStateException e) {
-        return ResponseEntity.status(400).body(new ApiResponseDTO<>(false, e.getMessage(), null));
+    public ResponseEntity<ApiResponseDTO<Throwable>> handleIllegalStateException(IllegalStateException e) {
+        return ResponseEntity.status(400).body(new ApiResponseDTO<>(false, e.getMessage(), e.getCause()));
     }
 
     @ExceptionHandler(ResourceAlreadyExistException.class)
-    public ResponseEntity<ApiResponseDTO<String>> handleResourceAlreadyExistException(ResourceAlreadyExistException e) {
-        return ResponseEntity.status(400).body(new ApiResponseDTO<>(false, e.getMessage(), null));
+    public ResponseEntity<ApiResponseDTO<Throwable>> handleResourceAlreadyExistException(ResourceAlreadyExistException e) {
+        return ResponseEntity.status(400).body(new ApiResponseDTO<>(false, e.getMessage(), e.getCause()));
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiResponseDTO<String>> handleResourceNotFoundException(ResourceNotFoundException e) {
-        return ResponseEntity.status(404).body(new ApiResponseDTO<>(false, e.getMessage(), null));
+    public ResponseEntity<ApiResponseDTO<Throwable>> handleResourceNotFoundException(ResourceNotFoundException e) {
+        return ResponseEntity.status(404).body(new ApiResponseDTO<>(false, e.getMessage(), e.getCause()));
     }
 
     @ExceptionHandler(RoleNotFoundException.class)
-    public ResponseEntity<ApiResponseDTO<String>> handleRoleNotFoundException(RoleNotFoundException e) {
-        return ResponseEntity.status(404).body(new ApiResponseDTO<>(false, e.getMessage(), null));
+    public ResponseEntity<ApiResponseDTO<Throwable>> handleRoleNotFoundException(RoleNotFoundException e) {
+        return ResponseEntity.status(404).body(new ApiResponseDTO<>(false, e.getMessage(), e.getCause()));
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ResponseEntity<ApiResponseDTO<String>> handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
-        return ResponseEntity.status(400).body(new ApiResponseDTO<>(false, e.getMessage(), null));
+    public ResponseEntity<ApiResponseDTO<Throwable>> handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
+        return ResponseEntity.status(400).body(new ApiResponseDTO<>(false, e.getMessage(), e.getCause()));
     }
 }
