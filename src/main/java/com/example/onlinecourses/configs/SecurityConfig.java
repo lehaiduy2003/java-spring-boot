@@ -4,7 +4,7 @@ import com.example.onlinecourses.backgroundJobs.interfaces.ITokenBlacklistServic
 import com.example.onlinecourses.filters.CookieFilter;
 import com.example.onlinecourses.filters.JwtFilter;
 import com.example.onlinecourses.services.interfaces.IUserService;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -18,7 +18,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class SecurityConfig {
 
     private final OAuth2Config oAuth2Config;
@@ -26,12 +26,11 @@ public class SecurityConfig {
     private final IUserService userService;
 
     private static final String[] WHITE_LIST = {
-            "/v3/api-docs/**",
-            "/v1/api-docs/**",
-            "/swagger-resources/**",
-            "/swagger-ui.html",
-            "/swagger-ui/**",
-            "/static/**",
+            "/", // Allow access to the home page
+            "/v3/api-docs/**", // Allow access to API docs
+            "/swagger-ui/**", // Allow access to Swagger UI
+            "/css/**", // Allow access to CSS files
+            "/js/**", // Allow access to JS files
             "/oauth2/authorization/**",
             "/api/v1/auth/**",
             "/api/v1/oauth2/**",
@@ -71,7 +70,7 @@ public class SecurityConfig {
             .logout(logout -> logout
                 .logoutSuccessUrl("/").permitAll()
             )
-//            //  Custom Filter
+            //  Custom Filter
             .addFilterBefore(new JwtFilter(tokenBlacklistService, userService), UsernamePasswordAuthenticationFilter.class)
             .addFilterAfter(new CookieFilter(tokenBlacklistService, userService), JwtFilter.class);
 
