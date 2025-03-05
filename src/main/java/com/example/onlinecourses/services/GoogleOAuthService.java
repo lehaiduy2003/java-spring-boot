@@ -13,11 +13,10 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class GoogleOAuthServiceAttributes extends BaseOAuthService implements IOAuth2Service, IExtractOAuthUserAttributes {
-    public GoogleOAuthServiceAttributes(UsersRepository usersRepository, OAuth2ProviderRepository oAuth2ProviderRepository, OAuth2AuthorizedClientService authorizedClientService) {
+public class GoogleOAuthService extends BaseOAuthService implements IOAuth2Service, IExtractOAuthUserAttributes {
+    public GoogleOAuthService(UsersRepository usersRepository, OAuth2ProviderRepository oAuth2ProviderRepository, OAuth2AuthorizedClientService authorizedClientService) {
         super(usersRepository, oAuth2ProviderRepository, authorizedClientService);
     }
 
@@ -37,7 +36,6 @@ public class GoogleOAuthServiceAttributes extends BaseOAuthService implements IO
     }
 
     @Override
-    @Transactional
     public AuthResponseDTO continueWithOAuth(OAuth2AuthenticationToken oAuthToken) {
         OAuth2User oAuth2User = oAuthToken.getPrincipal();
         String provider = oAuthToken.getAuthorizedClientRegistrationId();
