@@ -26,22 +26,15 @@ public class JwtUtil {
 
     // Convert roles to list of strings
     private static List<String> getUserRoles(User user) {
-        List<String> roles = new ArrayList<>();
         Set<Role> userRoles = user.getRoles();
-        if(userRoles != null) {
-            roles = userRoles.stream()
-                .map(Role::getName)
-                .toList();
-        }
-        return roles;
+        // If user has roles, map the roles to list of strings
+        return userRoles != null && !userRoles.isEmpty() ? userRoles.stream()
+            .map(Role::getName)
+            .toList() : new ArrayList<>(List.of("GUEST")); // Set default role as GUEST if user has no roles
     }
 
     public static String generateAccessToken(User user) {
         List<String> roles = getUserRoles(user);
-        // Set default role as GUEST if user has no roles
-        if(roles.isEmpty()) {
-            roles.add("GUEST");
-        }
         return Jwts.builder()
             .subject(user.getEmail())
             .claim("id", user.getId())
