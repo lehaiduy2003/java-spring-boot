@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -37,12 +38,13 @@ public class BaseOAuthService extends DefaultOAuth2UserService {
         return oAuth2User.getName();
     }
 
-    protected User checkUser(String email, String name, String picture) {
+    @Transactional
+    public User checkUser(String email, String name, String picture) {
         return usersRepository.findUserByEmail(email).orElseGet(() -> createUser(email, name, picture));
     }
 
     // No need to add role here, the role update logic will handle when the first time user sign in
-    private User createUser(String email, String name, String picture) {
+    public User createUser(String email, String name, String picture) {
         User user = User.builder()
             .email(email)
             .fullname(name)
@@ -59,7 +61,8 @@ public class BaseOAuthService extends DefaultOAuth2UserService {
      * @param user The user object
      * @return The OAuth provider object
      */
-    protected OauthProvider checkProvider(String openId, String provider, String email, User user) {
+    @Transactional
+    public OauthProvider checkProvider(String openId, String provider, String email, User user) {
         Optional<OauthProvider> oAuthProviderOptional = oAuth2ProviderRepository.findOauthProviderByOpenId(openId);
         if(oAuthProviderOptional.isPresent()) {
             OauthProvider oauthProvider = oAuthProviderOptional.get();
@@ -82,7 +85,7 @@ public class BaseOAuthService extends DefaultOAuth2UserService {
      * @param user The user object
      * @return new OAuth provider object
      */
-    private OauthProvider createProvider(String openId, String provider, String email, User user) {
+    public OauthProvider createProvider(String openId, String provider, String email, User user) {
         String token = retrieveToken(provider, openId); // Retrieve the token from the OAuth2AuthorizedClientService
         OauthProvider oauthProvider = OauthProvider.builder()
             .openId(openId)
@@ -99,7 +102,8 @@ public class BaseOAuthService extends DefaultOAuth2UserService {
      * @param user The user object
      * @param oauthProvider The OAuth provider object
      */
-    protected void linkOAuthMethod(User user, OauthProvider oauthProvider) {
+    @Transactional
+    public void linkOAuthMethod(User user, OauthProvider oauthProvider) {
         // init the oauthProviders set for new user to avoid NullPointerException
         if(user.getOauthProviders() == null) {
             user.setOauthProviders(
