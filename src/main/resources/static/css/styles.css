@@ -76,22 +76,13 @@ h2 {
     background-color: #0056b3;
 }
 
-.btn-student {
+.btn-oauth {
     background-color: #28a745;
     color: white;
 }
 
-.btn-student:hover {
+.btn-oauth:hover {
     background-color: #218838;
-}
-
-.btn-teacher {
-    background-color: #ffc107;
-    color: black;
-}
-
-.btn-teacher:hover {
-    background-color: #e0a800;
 }
 
 /* Role Buttons Container */
