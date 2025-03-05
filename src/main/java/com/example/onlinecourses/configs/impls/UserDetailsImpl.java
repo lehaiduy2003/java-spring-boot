@@ -15,6 +15,7 @@ import java.util.Set;
 public class UserDetailsImpl implements UserDetails {
     private final Long id;
     private final String email;
+    private final String fullname;
     private final String phoneNumber;
     private final String username;
     private final String password;

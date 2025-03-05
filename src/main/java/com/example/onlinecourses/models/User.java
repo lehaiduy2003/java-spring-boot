@@ -77,7 +77,7 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Discussion> discussions;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private Set<OauthProvider> oauthProviders;
 
     // Encrypt sensitive fields before saving or after updating the user data

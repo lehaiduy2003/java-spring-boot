@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import com.example.onlinecourses.repositories.UsersRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -30,6 +31,11 @@ public class UserService implements IUserService {
         this.roleService = roleService;
     }
 
+    /**
+     * Load user by username or email
+     * @param identifier the username identifying the user whose data is required. It can be either the username or the email
+     * @return UserDetailsImpl object containing the user's data
+     */
     @Override
     public UserDetails loadUserByUsername(String identifier) throws UsernameNotFoundException {
         User user = usersRepository.findUserByEmailOrUsername(identifier, identifier)
@@ -37,6 +43,7 @@ public class UserService implements IUserService {
         return new UserDetailsImpl(
             user.getId(),
             user.getEmail(),
+            user.getFullname(),
             user.getPhoneNumber(),
             user.getUsername(),
             user.getPassword(),
@@ -56,6 +63,7 @@ public class UserService implements IUserService {
 
 
     @Override
+    @Transactional
     public UserDTO create(UserCreationDTO userCreationDTO) {
         if(isEmailExist(userCreationDTO.getEmail()))
             throw new ResourceAlreadyExistException("User with email " + userCreationDTO.getEmail() + " already exists");
@@ -75,6 +83,7 @@ public class UserService implements IUserService {
     }
 
     @Override
+    @Transactional
     public void deleteByEmail(String email) {
         if(!isEmailExist(email)) {
             throw new UsernameNotFoundException("User not found with email: " + email);
@@ -83,6 +92,7 @@ public class UserService implements IUserService {
     }
 
     @Override
+    @Transactional
     public void deleteByUsername(String username) {
         if(!isUsernameExist(username)) {
             throw new UsernameNotFoundException("User not found with username: " + username);
@@ -91,6 +101,7 @@ public class UserService implements IUserService {
     }
 
     @Override
+    @Transactional
     public void deleteByPhoneNumber(String phoneNumber) {
         if(!isPhoneNumberExist(phoneNumber)) {
             throw new UsernameNotFoundException("User not found with phone number: " + phoneNumber);
@@ -99,6 +110,7 @@ public class UserService implements IUserService {
     }
 
     @Override
+    @Transactional
     public UserDTO updateByEmail(String email, UserDTO userDTO) {
         UserDTO foundUser = findByEmail(email);
         User user = UserMapper.INSTANCE.toEntity(foundUser);
@@ -122,6 +134,7 @@ public class UserService implements IUserService {
     }
 
     @Override
+    @Transactional
     public UserDTO updateByPhoneNumber(String phoneNumber, UserDTO userDTO) {
         UserDTO foundUser = findByPhoneNumber(phoneNumber);
         User user = UserMapper.INSTANCE.toEntity(foundUser);

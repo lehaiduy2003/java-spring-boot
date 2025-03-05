@@ -1,6 +1,4 @@
 package com.example.onlinecourses.dtos.models;
-
-import com.example.onlinecourses.models.Role;
 import lombok.*;
 
 import java.util.Date;
