@@ -3,7 +3,7 @@
 <head>
     <title>OAuth2 Test</title>
     <!-- Link to external CSS file -->
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
 <div class="container">
@@ -12,7 +12,7 @@
     <!-- Basic Authentication Form -->
     <div class="form-container">
         <h2>Login with Username/Password</h2>
-        <form method="POST" action="/api/v1/auth/sign-in">
+        <form id="loginForm">
             <div class="form-group">
                 <label for="email">Email:</label>
                 <input type="text" id="email" name="email" required>
@@ -21,7 +21,7 @@
                 <label for="password">Password:</label>
                 <input type="password" id="password" name="password" required>
             </div>
-            <button type="submit" class="btn btn-primary">Login</button>
+            <button id="formSubmitButton" type="submit" class="btn btn-primary">Login</button>
         </form>
 
         <div class="or-divider">
@@ -29,7 +29,7 @@
         </div>
 
         <!-- OAuth2 Login with Role Selection -->
-        <a th:href="@{/oauth2/authorization/google}" class="btn btn-student">Login with google</a>
+        <a th:href="@{/oauth2/authorization/google}" class="btn btn-oauth">Login with google</a>
     </div>
 </div>
 
