@@ -22,13 +22,16 @@ public class CookieFilter extends BaseTokenFilter {
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
+        if(super.isAuthenticated()) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         Optional<String> refreshTokenOptional = RequestUtil.extractCookieFromRequest(request, "refreshToken");
 
         if (refreshTokenOptional.isPresent()) {
             String refreshToken = refreshTokenOptional.get();
             super.authenticateToken(refreshToken);
         }
-
         filterChain.doFilter(request, response);
     }
 }

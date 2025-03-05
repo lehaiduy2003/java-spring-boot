@@ -41,4 +41,8 @@ public abstract class BaseTokenFilter extends OncePerRequestFilter {
             this.handleValidToken(token);
         }
     }
+
+    protected boolean isAuthenticated() {
+        return SecurityContextUtil.getAuthentication().isAuthenticated();
+    }
 }
