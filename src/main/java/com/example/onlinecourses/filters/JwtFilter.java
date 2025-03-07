@@ -25,11 +25,6 @@ public class JwtFilter extends BaseTokenFilter {
                                     @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
         throws ServletException, IOException {
 
-        if(super.isAuthenticated()) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
         Optional<String> tokenOptional = RequestUtil.extractJwtFromRequest(request);
         if (tokenOptional.isPresent()) {
             String token = tokenOptional.get();
