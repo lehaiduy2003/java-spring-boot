@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- custom coloring conversion -->
+    <conversionRule conversionWord="highlightex" converterClass="com.example.onlinecourses.configs.HighlightingCompositeConverterEx" />
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+<!--            %d: message timestamp - allow all SimpleDateFormat formats-->
+<!--            %thread: thread name-->
+<!--            %-5level: log level (trace, debug, info, warn, error)-->
+<!--            %logger{36}: logger name - truncate to 36 characters-->
+<!--            %M: method name-->
+<!--            %msg: log message-->
+<!--            %n: new line-->
+<!--            %highlight: highlight log level-->
+<!--            %magenta: color name (%cyan, %blue, etc,...)-->
+            <pattern>%d{dd-MM-yyyy HH:mm:ss.SSS} %magenta([%thread]) %highlightex(%-5level) %cyan(%logger{36}.%M) - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>
