@@ -54,9 +54,11 @@ public class SecurityConfig {
                 .requestMatchers(WHITE_LIST).permitAll() // Allow access endpoints
                 .requestMatchers(HttpMethod.GET, ALLOWED_READ_ENDPOINTS).permitAll() // Allow GET requests for read endpoints
                 .anyRequest().authenticated() // All other endpoints require authentication
-            )
-            // OAuth2 Login
+            );
+        // OAuth2 Login
+        http
             .oauth2Login(oauth2 -> oauth2
+                .loginPage("/index").permitAll()
                 .authorizationEndpoint(authorization -> authorization
                     .authorizationRequestResolver(oAuth2Config.authorizationRequestResolver(null)) // Use the resolver from OAuth2Config
                 )
@@ -64,13 +66,18 @@ public class SecurityConfig {
                     .userService(oAuth2Config.oauth2UserService()) // Use the OAuth2UserService from OAuth2Config to handle user details
                 )
                 .successHandler(oAuth2Config.getOAuthSuccessHandler()) // Use the success handler from OAuth2Config
-            )
-            // Basic Authentication
+            );
+        // Basic Authentication
+        http
             .httpBasic(withDefaults()) // Enable basic authentication
+            .formLogin(login -> login
+                .loginPage("/index").permitAll()
+            )
             .logout(logout -> logout
                 .logoutSuccessUrl("/").permitAll()
-            )
-            //  Custom Filter
+            );
+        //  Custom Filter
+        http
             .addFilterBefore(new JwtFilter(tokenBlacklistService, userService), UsernamePasswordAuthenticationFilter.class)
             .addFilterAfter(new CookieFilter(tokenBlacklistService, userService), JwtFilter.class);
 
