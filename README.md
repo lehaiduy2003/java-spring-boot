@@ -25,7 +25,7 @@ This project is an API for managing online courses, built with Java, Spring Boot
 ## Getting Started
 
 ### Prerequisites
-- Java 20 or higher
+- Java 21 or higher
 - Maven 3.6.0 or higher
 
 ### Installation
