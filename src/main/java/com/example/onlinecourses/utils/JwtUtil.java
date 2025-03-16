@@ -12,7 +12,8 @@ import java.util.logging.Logger;
 public class JwtUtil {
     private static final String SECRET_KEY = Dotenv.load().get("JWT_SECRET");
 
-    private static final long JWT_EXPIRATION = 1000L * 60 * 60 * 24; // 24 hours
+    private static final long JWT_EXPIRATION = Dotenv.load().get("JWT_EXPIRATION") != null ? Long.parseLong(Dotenv.load().get("JWT_EXPIRATION")) : 1000L * 60 * 60 * 24; // 1 day as default
+    private static final long JWT_REFRESH_EXPIRATION = Dotenv.load().get("JWT_REFRESH_EXPIRATION") != null ? Long.parseLong(Dotenv.load().get("JWT_REFRESH_EXPIRATION")) : 1000L * 60 * 60 * 24 * 7; // 7 days as default
 
     private static final Logger logger = Logger.getLogger(JwtUtil.class.getName());
 
@@ -40,7 +41,7 @@ public class JwtUtil {
             .claim("id", user.getId())
             .claim("roles", roles)
             .issuedAt(Date.from(Instant.now()))
-            .expiration(Date.from(Instant.now().plusSeconds(JWT_EXPIRATION)))
+            .expiration(Date.from(Instant.now().plusMillis(JWT_EXPIRATION)))
             .id(UUID.randomUUID().toString()) // Unique identifier for the token
             .signWith(getSecretKey())
             .compact();
@@ -51,7 +52,7 @@ public class JwtUtil {
             .subject(user.getEmail())
             .claim("id", user.getId())
             .issuedAt(Date.from(Instant.now()))
-            .expiration(Date.from(Instant.now().plusSeconds(JWT_EXPIRATION * 7)))
+            .expiration(Date.from(Instant.now().plusMillis(JWT_REFRESH_EXPIRATION)))
             .id(UUID.randomUUID().toString()) // Unique identifier for the token
             .signWith(getSecretKey())
             .compact();
