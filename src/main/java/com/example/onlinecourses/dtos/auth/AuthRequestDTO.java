@@ -9,6 +9,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class AuthRequestDTO {
     @Email(message = "Email should be valid")
     private String email;
