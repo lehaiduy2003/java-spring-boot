@@ -1,5 +1,7 @@
 package com.example.onlinecourses.services;
 
+import com.example.onlinecourses.annotations.LogEntryPoint;
+import com.example.onlinecourses.annotations.LogExecTime;
 import com.example.onlinecourses.configs.impls.UserDetailsImpl;
 import com.example.onlinecourses.dtos.auth.AuthRequestDTO;
 import com.example.onlinecourses.dtos.auth.AuthResponseDTO;
@@ -42,14 +44,29 @@ public class AuthService implements IAuthService {
         return UserMapper.INSTANCE.toEntity(userDetails);
     }
 
-    @Override
-    public AuthResponseDTO signIn(AuthRequestDTO authRequestDTO) {
-        Authentication authentication = authenticate(authRequestDTO.getEmail(), authRequestDTO.getPassword());
+    /**
+     * Generate the response object and set the security context
+     * @param authentication The authentication object
+     * @return the authentication response DTO object
+     */
+    private AuthResponseDTO toAuthResponseDTO(Authentication authentication) {
         User user = toUser((UserDetailsImpl) authentication.getPrincipal());
         String accessToken = JwtUtil.generateAccessToken(user);
         String refreshToken = JwtUtil.generateRefreshToken(user);
+        SecurityContextUtil.setSecurityContext(authentication);
+        return AuthResponseDTO.builder()
+            .user(UserMapper.INSTANCE.toUserDataDTO(user))
+            .accessToken(accessToken)
+            .refreshToken(refreshToken)
+            .build();
+    }
 
-        return AuthResponseDTO.builder().user(UserMapper.INSTANCE.toUserDataDTO(user)).accessToken(accessToken).refreshToken(refreshToken).build();
+    @LogEntryPoint
+    @LogExecTime
+    @Override
+    public AuthResponseDTO signIn(AuthRequestDTO authRequestDTO) {
+        Authentication authentication = authenticate(authRequestDTO.getEmail(), authRequestDTO.getPassword());
+        return toAuthResponseDTO(authentication);
     }
 
     @Override
@@ -60,11 +77,7 @@ public class AuthService implements IAuthService {
         UserDTO userDTO = userService.create(userCreationDTO);
         // auto login after sign up
         Authentication authentication = authenticate(userDTO.getEmail(), originalPassword);
-        User user = toUser((UserDetailsImpl) authentication.getPrincipal());
-        String accessToken = JwtUtil.generateAccessToken(user);
-        String refreshToken = JwtUtil.generateRefreshToken(user);
-
-        return AuthResponseDTO.builder().user(UserMapper.INSTANCE.toUserDataDTO(userDTO)).accessToken(accessToken).refreshToken(refreshToken).build();
+        return toAuthResponseDTO(authentication);
     }
 
     @Override
@@ -80,6 +93,7 @@ public class AuthService implements IAuthService {
        // get the authentication object from the security context
        Authentication authentication = SecurityContextUtil.getAuthentication();
        User user = toUser((UserDetailsImpl) authentication.getPrincipal());
+       SecurityContextUtil.setSecurityContext(authentication);
        return JwtUtil.generateAccessToken(user); // Generate a new access token
     }
 
@@ -90,6 +104,7 @@ public class AuthService implements IAuthService {
         long expiration = (claims.getExpiration().getTime() - System.currentTimeMillis()) / 1000; // Get the remaining time in seconds
 
         if(expiration > 0) {
+            SecurityContextUtil.clearSecurityContext();
             tokenBlacklistService.revokeToken(refreshToken, expiration);
         } else {
             throw new ExpiredJwtException(null, claims, "Refresh token has expired");
