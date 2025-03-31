@@ -13,28 +13,25 @@ import java.util.logging.Logger;
 
 @Aspect
 @Component
-public class LoggingAspect {
-    private static final Logger logger = Logger.getLogger(LoggingAspect.class.getName());
+public class LoggingAspect extends BaseAspect {
+
+    public LoggingAspect() {
+        super(Logger.getLogger(LoggingAspect.class.getName()));
+    }
 
     // log before execute method
     @Before("@annotation(com.example.onlinecourses.annotations.LogEntryPoint)")
     public void logEntryPoint(JoinPoint joinPoint) {
         Object[] args = joinPoint.getArgs();
         String argsString = Arrays.toString(args);
-        if (logger.isLoggable(Level.INFO)) {
-            logger.info(String.format("Executing method: %s", joinPoint.getSignature()));
-        }
-        if(args.length > 0 && logger.isLoggable(Level.FINE)) {
-            logger.info(String.format("Method arguments: %s", argsString));
-        }
+        String message = String.format("Method %s called with arguments: %s", joinPoint.getSignature(), argsString);
+        super.logMsg(message, Level.INFO);
     }
 
     // log result of method
     @After("@annotation(com.example.onlinecourses.annotations.LogExecResult)")
     public void logExecResult(JoinPoint joinPoint) {
-        if (logger.isLoggable(Level.INFO)) {
-            logger.info(String.format("Method executed: %s", joinPoint.getSignature()));
-        }
+        super.logMsg(String.format("Method %s executed", joinPoint.getSignature()), Level.INFO);
     }
 
     // calculate execution time of method and log result or error
@@ -45,16 +42,10 @@ public class LoggingAspect {
         try {
             result = joinPoint.proceed();
             long executionTime = System.currentTimeMillis() - start;
-            if (logger.isLoggable(Level.INFO)) {
-                logger.info(String.format("%s executing succeed in %dms", joinPoint.getSignature(), executionTime));
-            }
-            if(logger.isLoggable(Level.FINE)) {
-                logger.fine(String.format("Method result: %s", result));
-            }
+            super.logMsg(String.format("Method %s executed in %d ms", joinPoint.getSignature(), executionTime), Level.INFO);
+            super.logMsg(String.format("Method %s returned: %s", joinPoint.getSignature(), result), Level.INFO);
         } catch (Throwable throwable) {
-            if (logger.isLoggable(Level.SEVERE)) {
-                logger.severe(String.format("Method %s threw an exception: %s", joinPoint.getSignature(), throwable.getMessage()));
-            }
+            super.logEx(joinPoint, throwable);
             throw throwable;
         }
         return result;
