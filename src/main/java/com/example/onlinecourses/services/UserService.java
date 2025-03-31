@@ -1,4 +1,5 @@
 package com.example.onlinecourses.services;
+import com.example.onlinecourses.annotations.AuthorizePermission;
 import com.example.onlinecourses.dtos.requests.post.UserCreationDTO;
 import com.example.onlinecourses.dtos.models.UserDTO;
 import com.example.onlinecourses.dtos.responses.data.UserDataDTO;
@@ -54,6 +55,7 @@ public class UserService implements IUserService {
     }
 
     @Override
+    @AuthorizePermission("MANAGE_USER")
     public UserDTO updateById(Long id, UserDTO userDTO) {
         User user = usersRepository.findById(id)
             .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
