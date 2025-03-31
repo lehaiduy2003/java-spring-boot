@@ -23,6 +23,10 @@ public class UserDetailsImpl implements UserDetails {
     private final Set<OauthProvider> oauthProviders;
     private final Set<Role> roles;
 
+    /**
+     * Get the authority roles granted to the user
+     * @return a role collection of granted authorities for the user
+     */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if(roles == null) return new HashSet<>(); // return empty set if roles is null
