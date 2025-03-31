@@ -1,6 +1,8 @@
 package com.example.onlinecourses.services;
 
+import com.example.onlinecourses.annotations.AuthorizePermission;
 import com.example.onlinecourses.annotations.LogEntryPoint;
+import com.example.onlinecourses.annotations.LogExecResult;
 import com.example.onlinecourses.annotations.LogExecTime;
 import com.example.onlinecourses.configs.impls.UserDetailsImpl;
 import com.example.onlinecourses.dtos.auth.AuthRequestDTO;
@@ -63,6 +65,7 @@ public class AuthService implements IAuthService {
 
     @LogEntryPoint
     @LogExecTime
+    @LogExecResult
     @Override
     public AuthResponseDTO signIn(AuthRequestDTO authRequestDTO) {
         Authentication authentication = authenticate(authRequestDTO.getEmail(), authRequestDTO.getPassword());
