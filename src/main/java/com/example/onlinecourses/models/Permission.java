@@ -3,6 +3,7 @@ package com.example.onlinecourses.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import net.minidev.json.annotate.JsonIgnore;
 
 import java.util.Set;
 
@@ -27,6 +28,7 @@ public class Permission {
     private String description;
 
     @ManyToMany(mappedBy = "permissions", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @JsonIgnore // ignore the roles attribute in the JSON/swagger
     private Set<Role> roles; // For many-to-many relationship with Role
 
     public void addRole(Role role) {
