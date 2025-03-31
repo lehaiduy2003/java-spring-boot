@@ -5,9 +5,12 @@ import com.example.onlinecourses.models.Role;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
+import java.util.Set;
+
 @Mapper
 public interface RoleMapper {
     RoleMapper INSTANCE = Mappers.getMapper(RoleMapper.class);
     RoleDTO toDTO(Role role);
     Role toEntity(RoleDTO roleDTO);
+    Set<Role> toEntities(Set<RoleDTO> roleDTOs);
 }
