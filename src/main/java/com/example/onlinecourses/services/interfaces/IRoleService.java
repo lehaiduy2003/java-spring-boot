@@ -10,4 +10,5 @@ public interface IRoleService {
     Role saveRole(Role role);
     void deleteRole(Role role);
     Role updateById(Long id, String roleName);
+    boolean isRolePermitted(Set<Role> roles, String permission);
 }
