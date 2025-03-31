@@ -1,8 +1,10 @@
 package com.example.onlinecourses.enums;
 
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
+@ToString
 public enum CourseLevel {
     ELEMENTARY("ELEMENTARY"),
     JUNIOR_HIGH("JUNIOR_HIGH"),

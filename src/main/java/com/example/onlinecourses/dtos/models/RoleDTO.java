@@ -9,6 +9,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class RoleDTO {
     private Long id;
     private String name;

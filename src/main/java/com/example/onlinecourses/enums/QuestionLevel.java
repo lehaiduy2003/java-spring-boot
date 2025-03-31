@@ -1,8 +1,10 @@
 package com.example.onlinecourses.enums;
 
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
+@ToString
 public enum QuestionLevel {
     RECOGNITION("RECOGNITION"),
     COMPREHENSION("COMPREHENSION"),

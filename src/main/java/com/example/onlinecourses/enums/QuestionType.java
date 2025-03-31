@@ -1,8 +1,10 @@
 package com.example.onlinecourses.enums;
 
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
+@ToString
 public enum QuestionType {
     MULTIPLE_CHOICE("MULTIPLE_CHOICE"),
     TRUE_FALSE("TRUE_FALSE"),
