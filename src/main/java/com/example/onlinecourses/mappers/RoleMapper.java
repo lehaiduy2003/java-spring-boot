@@ -11,6 +11,7 @@ import java.util.Set;
 public interface RoleMapper {
     RoleMapper INSTANCE = Mappers.getMapper(RoleMapper.class);
     RoleDTO toDTO(Role role);
+    Set<RoleDTO> toDTOs(Set<Role> roles);
     Role toEntity(RoleDTO roleDTO);
     Set<Role> toEntities(Set<RoleDTO> roleDTOs);
 }
