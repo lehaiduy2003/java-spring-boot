@@ -8,7 +8,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class CORSConfig implements WebMvcConfigurer {
 
-    private static final String[] ALLOWED_METHODS = { "GET", "POST", "PUT", "DELETE" };
+    private static final String[] ALLOWED_METHODS = { "GET", "POST", "PUT", "DELETE", "PATCH" };
     private static final String[] ALLOWED_HEADERS = { "Authorization", "Content-Type", "Cache-Control" };
     private static final String ALLOWED_ORIGIN = Dotenv.load().get("CORS_ORIGIN");
 
