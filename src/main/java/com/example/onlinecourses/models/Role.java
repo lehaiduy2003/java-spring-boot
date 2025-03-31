@@ -1,5 +1,6 @@
 package com.example.onlinecourses.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -32,10 +33,12 @@ public class Role {
         joinColumns = @JoinColumn(name = "role_id"),
         inverseJoinColumns = @JoinColumn(name = "permission_id")
     )
+    @JsonIgnore
     private Set<Permission> permissions;
 
     // Mapping the many-to-many relationship between Role and User with roles attribute in User class
     @ManyToMany(mappedBy = "roles", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @JsonIgnore
     private List<User> users;
 
     public void addPermission(Permission permission) {

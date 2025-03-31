@@ -1,5 +1,6 @@
 package com.example.onlinecourses.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -59,9 +60,11 @@ public class User {
 
     // Mapping with question by creator attribute in Question class
     @OneToMany(mappedBy = "creator", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Question> questions;
 
     @OneToMany(mappedBy = "creator", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Exam> exams;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -70,13 +73,16 @@ public class User {
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
+    @JsonIgnore
     private Set<Role> roles;
 
     // Mapping with discussion by user attribute in Discussion class
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Discussion> discussions;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    @JsonIgnore
     private Set<OauthProvider> oauthProviders;
 
     // Encrypt sensitive fields before saving or after updating the user data

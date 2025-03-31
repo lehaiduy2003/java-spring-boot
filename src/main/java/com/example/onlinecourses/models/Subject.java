@@ -1,5 +1,6 @@
 package com.example.onlinecourses.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -29,6 +30,7 @@ public class Subject {
     @NotBlank
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "subject", nullable = false)
+    @JsonIgnore
     private List<Exam> exams;
 
     public void addCourse(Course course) {

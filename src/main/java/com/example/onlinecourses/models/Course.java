@@ -1,6 +1,7 @@
 package com.example.onlinecourses.models;
 
 import com.example.onlinecourses.enums.CourseLevel;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -42,6 +43,7 @@ public class Course {
 
     // For one-to-many relationship with Chapter by course attribute
     @OneToMany(mappedBy = "course", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnore
     private Set<Chapter> chapters;
 
     @Column(name = "created_at")

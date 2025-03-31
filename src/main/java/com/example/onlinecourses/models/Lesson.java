@@ -1,5 +1,6 @@
 package com.example.onlinecourses.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -33,6 +34,7 @@ public class Lesson {
 
     // For one-to-many relationship with Discussion by lesson attribute
     @OneToMany(mappedBy = "lesson", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Discussion> discussions;
 
     public void addDiscussion(Discussion discussion) {

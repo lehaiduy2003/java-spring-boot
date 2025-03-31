@@ -1,5 +1,6 @@
 package com.example.onlinecourses.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -40,6 +41,7 @@ public class Discussion {
     private Discussion parent; // For many-to-one relationship with Discussion (self-referencing)
 
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Discussion> replies; // For one-to-many relationship with Discussion (self-referencing)
 
     public void addReply(Discussion reply) {

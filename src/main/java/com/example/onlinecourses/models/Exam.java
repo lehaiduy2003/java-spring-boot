@@ -1,6 +1,7 @@
 package com.example.onlinecourses.models;
 
 import com.example.onlinecourses.enums.ExamType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,6 +34,7 @@ public class Exam {
 
     // Mapping with Question by exam attribute in Question class
     @OneToMany(mappedBy = "exam", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Question> questions;
 
     public void addQuestion(Question question) {

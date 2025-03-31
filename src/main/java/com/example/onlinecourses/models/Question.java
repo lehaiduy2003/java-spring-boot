@@ -2,6 +2,7 @@ package com.example.onlinecourses.models;
 
 import com.example.onlinecourses.enums.QuestionLevel;
 import com.example.onlinecourses.enums.QuestionType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -42,6 +43,7 @@ public class Question {
 
     // Mapping for one-to-many relationship with QuestionHint by question attribute
     @OneToMany(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<QuestionHint> hints;
 
     @NotBlank

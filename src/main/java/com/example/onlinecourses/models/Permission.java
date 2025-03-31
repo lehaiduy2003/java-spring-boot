@@ -1,9 +1,9 @@
 package com.example.onlinecourses.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
-import net.minidev.json.annotate.JsonIgnore;
 
 import java.util.Set;
 
